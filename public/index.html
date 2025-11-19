@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGK AI</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-200 h-screen flex flex-col overflow-hidden selection:bg-indigo-500/30">
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="hidden fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
+            <div class="flex justify-center mb-6">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+                    <i data-lucide="sparkles" class="text-white w-6 h-6"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-white text-center mb-2">Welcome to AGK AI</h2>
+            <p class="text-slate-400 text-center mb-8">Sign in to access your chat history</p>
+            <form id="auth-form" class="space-y-4">
+                <input type="text" id="auth-username" placeholder="Username" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:border-indigo-500 outline-none">
+                <input type="password" id="auth-password" placeholder="Password" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:border-indigo-500 outline-none">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-all">Sign In</button>
+            </form>
+            <p class="text-center mt-6 text-sm text-slate-500">
+                <button id="toggle-auth-mode" class="text-indigo-400 hover:text-indigo-300">Need an account? Register</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white">User Settings</h2>
+                <button id="close-settings" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="settings-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">New Username</label>
+                    <input type="text" id="settings-username" placeholder="Leave empty to keep current" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:border-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1 uppercase">New Password</label>
+                    <input type="password" id="settings-password" placeholder="Leave empty to keep current" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:border-indigo-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-all">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP LAYOUT -->
+    <div id="app-layout" class="hidden flex w-full h-full relative">
+        
+        <!-- SIDEBAR WRAPPER -->
+        <aside id="sidebar" class="bg-slate-900 border-r border-slate-800 flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out flex flex-col hidden md:flex" style="width: 260px;">
+            <div class="w-[260px] h-full flex flex-col"> 
+                
+                <!-- Sidebar Header -->
+                <div class="p-4 h-16 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <i data-lucide="sparkles" class="text-white w-4 h-4"></i>
+                        </div>
+                        <h1 class="font-bold text-slate-100 text-lg tracking-tight">AGK AI</h1>
+                    </div>
+                    <button id="close-sidebar-btn" class="p-1 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors md:hidden">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <!-- New Chat -->
+                <div class="px-3 pb-2">
+                    <button id="new-chat-btn" class="w-full flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition-all shadow-md group">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span class="font-medium">New Chat</span>
+                    </button>
+                </div>
+
+                <!-- Chat List -->
+                <div class="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar" id="conversation-list"></div>
+
+                <!-- User Profile -->
+                <div class="p-3 border-t border-slate-800 mt-auto bg-slate-900">
+                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 transition-colors group cursor-pointer">
+                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0" id="settings-btn">
+                            <i data-lucide="user" class="w-4 h-4 text-slate-300"></i>
+                        </div>
+                        <div id="user-display" class="text-sm text-slate-200 font-medium truncate flex-1">User</div>
+                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 p-1 rounded-md transition-colors">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CHAT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 bg-slate-950 relative w-full">
+            
+            <!-- Header -->
+            <header class="sticky top-0 z-10 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 p-4 flex items-center gap-4 h-16 justify-between">
+                <div class="flex items-center gap-4">
+                    <button id="main-sidebar-toggle" class="p-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                        <i data-lucide="panel-left" class="w-5 h-5"></i>
+                    </button>
+                    <div class="flex-1 font-medium text-slate-200 truncate" id="chat-header-title">AGK AI Assistant</div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth custom-scrollbar">
+                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-500">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center mb-4">
+                         <i data-lucide="message-square" class="w-8 h-8 opacity-50"></i>
+                    </div>
+                    <p>Select a conversation or start a new chat.</p>
+                </div>
+            </div>
+            
+            <!-- Loading -->
+            <div id="loading-indicator" class="hidden px-8 pb-4">
+                 <div class="flex gap-3 items-center">
+                    <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce delay-75"></div>
+                    <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce delay-150"></div>
+                    <span class="text-slate-500 text-sm ml-2">Thinking...</span>
+                  </div>
+            </div>
+
+            <!-- Input -->
+            <div class="p-4 bg-slate-950 border-t border-slate-800">
+                <form id="chat-form" class="max-w-4xl mx-auto relative">
+                    <div class="relative flex items-center">
+                        <input id="user-input" type="text" placeholder="Message..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-5 pr-24 py-4 text-slate-100 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all" autocomplete="off" />
+                        
+                        <div class="absolute right-2 flex items-center gap-2">
+                            <button type="button" id="voice-btn" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors relative">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                                <span class="mic-pulse absolute inset-0 rounded-lg bg-red-500/20 hidden"></span>
+                            </button>
+                            
+                            <!-- SEND BUTTON -->
+                            <button type="submit" id="send-btn" class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition-colors">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                            
+                            <!-- STOP BUTTON (Hidden by default) -->
+                            <button type="button" id="stop-btn" class="hidden p-2 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-colors">
+                                <i data-lucide="square" class="w-5 h-5 fill-current"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <p class="text-center text-[10px] text-slate-600 mt-2">AGK AI can make mistakes.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
