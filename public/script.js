@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api';
+// This works for both localhost AND Render automatically.
+const API_URL = '/api';
 let isRegistering = false;
 let currentConversationId = null; 
 let isEditingTitle = false;
