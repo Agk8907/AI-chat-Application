@@ -13,7 +13,7 @@ app.use(express.static('public'));
 
 // --- CONFIGURATION ---
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/agk_ai_db";
+const MONGO_URI = process.env.MONGO_URI 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 const PORT = process.env.PORT || 3000;
 
