@@ -1,92 +1,132 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 body { 
-    font-family: 'Inter', sans-serif; 
-    background-color: #020617; 
-    color: #e2e8f0; 
-}
-
-/* --- SIDEBAR LOGIC --- */
-
-/* Default: Desktop (Visible), Mobile (Hidden by Tailwind classes in HTML) */
-
-/* STATE: Hidden */
-.sidebar-hidden {
-    width: 0px !important;
-    min-width: 0px !important;
-    border-right: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* MOBILE OVERLAY STATE */
-.sidebar-mobile-open {
-    display: flex !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100% !important; /* Full width on mobile usually, or partial */
-    max-width: 300px;
-    z-index: 50;
-    background-color: #0f172a; /* Ensure background is solid */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #0d0d0d;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* --- UTILITIES --- */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
-/* --- CHAT COMPONENTS --- */
-.msg-bubble {
-    max-width: 85%;
-    padding: 1rem;
-    border-radius: 1rem;
-    line-height: 1.6;
-    overflow-x: auto;
-    position: relative;
-}
-.msg-user { background-color: #4f46e5; color: white; border-top-right-radius: 0; margin-left: auto; }
-.msg-bot { background-color: #0f172a; border: 1px solid #1e293b; color: #e2e8f0; border-top-left-radius: 0; }
-
-.convo-item {
+/* --- SIDEBAR LAYOUT --- */
+#sidebar { 
+    width: 260px; 
+    min-width: 260px; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #94a3b8;
-    transition: all 0.2s;
-    height: 40px;
+    flex-direction: column;
+    background-color: #f8fafc; /* Slightly off-white for contrast */
+    border-right: 1px solid #e2e8f0;
 }
-.convo-item:hover { background-color: #1e293b; color: white; }
-.convo-item.active { background-color: #312e81; color: #a5b4fc; }
+
+#sidebar.sidebar-closed { 
+    width: 0 !important; 
+    min-width: 0 !important; 
+    flex-basis: 0 !important; 
+    padding: 0 !important; 
+    margin: 0 !important; 
+    border: none !important; 
+    opacity: 0; 
+    pointer-events: none; 
+}
+
+#open-sidebar-btn { display: none; }
+body.sidebar-is-hidden #open-sidebar-btn { display: block !important; }
+.sidebar-mobile-open { display: flex !important; position: absolute; top: 0; left: 0; height: 100%; width: 100%; max-width: 300px; z-index: 50; box-shadow: 5px 0 15px rgba(0,0,0,0.1); background-color: #f8fafc; }
+
+/* --- SIDEBAR CHAT ITEMS (STACK STYLE) --- */
+.convo-header { 
+    font-size: 0.75rem; 
+    color: #64748b; 
+    font-weight: 600; 
+    margin: 1.5rem 0 0.5rem 0.5rem; 
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* The "Box" Look */
+.convo-item { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 10px; 
+    
+    /* Card Styling */
+    padding: 12px 14px; 
+    margin-bottom: 8px; /* Gap between items */
+    border-radius: 10px; 
+    
+    background-color: #ffffff; 
+    border: 1px solid #e2e8f0; 
+    color: #475569; 
+    
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    height: auto;
+    min-height: 48px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+/* Hover Effect */
+.convo-item:hover { 
+    background-color: #ffffff; 
+    border-color: #94a3b8; 
+    color: #0f172a; 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+}
+
+/* Active Chat State */
+.convo-item.active { 
+    background-color: #eff6ff; /* Blue tint */
+    border-color: #60a5fa; 
+    color: #1e40af; 
+    box-shadow: 0 0 0 1px #60a5fa;
+}
 
 .convo-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; overflow: hidden; }
-.convo-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem; }
-.convo-header { font-size: 0.7rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin: 1.5rem 0 0.5rem 0.5rem; }
-.convo-edit-input { background-color: #0f172a; color: #fff; border: 1px solid #6366f1; border-radius: 4px; padding: 2px 4px; width: 100%; outline: none; }
+.convo-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem; font-weight: 500; }
+.convo-edit-input { background-color: #fff; color: #0d0d0d; border: 2px solid #3b82f6; border-radius: 4px; padding: 2px 4px; width: 100%; outline: none; }
+
 .convo-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
 .convo-item:hover .convo-actions { opacity: 1; }
-.convo-action-btn { padding: 5px; border-radius: 4px; color: #94a3b8; }
-.convo-action-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-.convo-action-btn.delete:hover { color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+.convo-action-btn { padding: 4px; border-radius: 4px; color: #94a3b8; transition: all 0.2s; }
+.convo-action-btn:hover { color: #0f172a; background-color: #f1f5f9; }
+.convo-action-btn.delete:hover { color: #ef4444; background-color: #fef2f2; }
 
-.msg-bubble pre[class*="language-"] { background: #020617 !important; border: 1px solid #334155; border-radius: 0.5rem; margin: 0.5rem 0; }
+/* --- REST OF UI --- */
+/* Suggestion Cards */
+
+
+/* Chat Container */
+#chat-container { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+/* Bubbles */
+.msg-bubble { max-width: 85%; padding: 12px 16px; border-radius: 1.5rem; line-height: 1.6; font-size: 1rem; position: relative; }
+.msg-user { background-color: #f0f4f9; color: #0d0d0d; border-top-right-radius: 4px; margin-left: auto; }
+.msg-bot { background-color: transparent; color: #0d0d0d; padding-left: 0; border-top-left-radius: 4px; }
+
+/* Markdown */
+.msg-bubble pre[class*="language-"] { background: #f9fafb !important; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 0.5rem 0; position: relative; }
 .msg-bubble code { font-family: 'Fira Code', monospace !important; font-size: 0.9em; }
-.copy-code-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; background: rgba(255, 255, 255, 0.1); color: #cbd5e1; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; opacity: 0; transition: background 0.2s; }
+.msg-bubble :not(pre) > code { background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 0.3em; font-family: monospace; color: #0f172a; font-weight: 600; }
+.copy-code-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; background: #e2e8f0; color: #475569; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; opacity: 0; transition: background 0.2s; }
 .msg-bubble pre:hover .copy-code-btn { opacity: 1; }
+.copy-code-btn:hover { background: #cbd5e1; color: #0f172a; }
 
+/* Voice */
 @keyframes pulse-red {
-    0% { opacity: 0.5; transform: scale(0.95); }
-    50% { opacity: 0.2; transform: scale(1.1); }
-    100% { opacity: 0.5; transform: scale(0.95); }
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
-.mic-active { color: #ef4444 !important; }
+.mic-active { color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1); }
 .mic-pulse { animation: pulse-red 1.5s infinite ease-in-out; }
